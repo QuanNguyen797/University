@@ -9,6 +9,10 @@ public class Enrolment
         date = "unknown";
         student = new Student();
         units = new Unit[4];
+        for (int i = 0; i < units.length; i++)
+        {
+            units[i] = new Unit();
+        }
     }
 
     public Enrolment(String date, Student student, Unit[] units)
@@ -25,8 +29,9 @@ public class Enrolment
         System.out.println("");
         for (int index = 0; index < units.length; index++)
         {
-            if (units[index] != null)
+            if (units[index] != null && !units[index].getUnitCode().equals("unknown"))
             {
+                System.out.println(student.getName() + "'s enrolled unit number " + (index + 1));
                 units[index].display();
                 System.out.println("");
             }

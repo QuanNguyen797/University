@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public class University
 {
@@ -8,7 +7,6 @@ public class University
     public University()
     {
         enrolments = new ArrayList<Enrolment>();
-        enrolments.add(new Enrolment());
     }
 
     public University(ArrayList<Enrolment> enrolments)
@@ -44,7 +42,8 @@ public class University
         return enrolments.get(index);
     }
 
-    public Student inputStudentDetails()
+
+    public void inputStudentDetails(Enrolment enrolment)
     {
         Input input = new Input();
         Validation validation = new Validation();
@@ -56,112 +55,108 @@ public class University
         do
         {
             name = input.acceptStringInput("Please enter student name: ");
-            if (!(validation.isBlank(name) && validation.stringLengthInRange(name, 3, 12)))
+            if ((validation.isBlank(name) || !validation.stringLengthInRange(name, 3, 12)))
             {
                 System.out.println("Invalid input. Student name must not be blank and between 3 and 12 characters.");
             }
-        } while (!(validation.isBlank(name) && validation.stringLengthInRange(name, 3, 12)));
+        } while ((validation.isBlank(name) || !validation.stringLengthInRange(name, 3, 12)));
 
         do
         {
             address = input.acceptStringInput("Please enter student address: ");
-            if (!(validation.isBlank(address) && validation.stringLengthInRange(address, 25, 100)))
+            if ((validation.isBlank(address) || !validation.stringLengthInRange(address, 25, 100)))
             {
                 System.out.println("Invalid input. Student address must not be blank and between 25 and 100 characters.");
             }
-        } while (!(validation.isBlank(address) && validation.stringLengthInRange(address, 25, 100)));
+        } while ((validation.isBlank(address) || !validation.stringLengthInRange(address, 25, 100)));
 
         do
         {
             phone = input.acceptStringInput("Please enter student phone number: ");
-            if (!(validation.isBlank(phone) && validation.stringLengthInRange(phone, 10, 10)))
+            if ((validation.isBlank(phone) || !validation.stringLengthInRange(phone, 10, 10)))
             {
                 System.out.println("Invalid input. Student phone number must not be blank and exactly 10 numbers.");
             }
-        } while (!(validation.isBlank(phone) && validation.stringLengthInRange(phone, 10, 10)));
+        } while ((validation.isBlank(phone) || !validation.stringLengthInRange(phone, 10, 10)));
 
         do
         {
             email = input.acceptStringInput("Please enter student email: ");
-            if (!validation.isBlank(email))
+            if (validation.isBlank(email))
             {
                 System.out.println("Invalid input. Student email must not be blank.");
             }
-        } while (!validation.isBlank(email));
+        } while (validation.isBlank(email));
 
         Student student = new Student(name, address, phone, email);
-        return student;
+        enrolment.setStudent(student);
     }
 
-    public Unit[] inputUnitDetails()
+    public void inputUnitDetails(Enrolment enrolment)
     {
-        Unit[] units = new Unit[4];
-        boolean null_flag = false;
-        for (int index = 0; index < units.length; index++)
+        Input console = new Input();
+        int unitNumber = -1;
+
+        do
         {
-            if (units[index] == null)
+            try
             {
-                null_flag = true;
+                unitNumber = console.acceptIntInput("Please enter number of units: ");
+                if (unitNumber < 0 || unitNumber > 4)
+                    System.out.println("Please enter an integer larger than 0 and less than 4");
             }
-        }
+            catch (Exception e)
+            {
+                System.out.println("Please enter an integer larger than 0 and less than 4");
+            }
+        } while (unitNumber < 0 || unitNumber > 4);
 
-        if (!null_flag)
+        for (int index = 0; index < unitNumber; index++)
         {
-            System.out.println("Maximum 4 units enrolled. Please remove existing units to enroll in new ones.");
-            return null;
-        }       
+            inputUnitDetailOnce(index, enrolment);
+        }
+    }
 
-        Scanner console = new Scanner(System.in);
+    public void inputUnitDetailOnce(int index, Enrolment enrolment)
+    {
         Input input = new Input();
         Validation validation = new Validation();
-
         String uCode = "unknown";
         String uDesc = "unknown";
         String cPointsNumber = "unknown";
-
         do
-        {
-            uCode = input.acceptStringInput("Please enter units code: ");
-            if (!(!validation.isBlank(uCode) && validation.stringLengthInRange(uCode, 7, 7)))
             {
-                System.out.println("Invalid input. Unit code must not be blank and exactly 7 characters.");
-            }
-        } while (!(!validation.isBlank(uCode) && validation.stringLengthInRange(uCode, 7, 7)));
+                uCode = input.acceptStringInput("\nPlease enter units code: ");
+                if (!(!validation.isBlank(uCode) && validation.stringLengthInRange(uCode, 7, 7)))
+                {
+                    System.out.println("Invalid input. Unit code must not be blank and exactly 7 characters.");
+                }
+            } while (!(!validation.isBlank(uCode) && validation.stringLengthInRange(uCode, 7, 7)));
 
-        do
-        {
-            uDesc = input.acceptStringInput("Please enter units description: ");
-            if (!(!validation.isBlank(uDesc) && validation.stringLengthInRange(uDesc, 1, 250)))
+            do
             {
-                System.out.println("Invalid input. Unit description must not be blank and between 1 and 250 characters.");
-            }
-        } while (!(!validation.isBlank(uDesc) && validation.stringLengthInRange(uDesc, 1, 250)));
+                uDesc = input.acceptStringInput("Please enter units description: ");
+                if (!(!validation.isBlank(uDesc) && validation.stringLengthInRange(uDesc, 1, 250)))
+                {
+                    System.out.println("Invalid input. Unit description must not be blank and between 1 and 250 characters.");
+                }
+            } while (!(!validation.isBlank(uDesc) && validation.stringLengthInRange(uDesc, 1, 250)));
 
-        do
-        {
-            cPointsNumber = input.acceptStringInput("Please enter credit points: ");
-            if (!validation.isInt(cPointsNumber))
+            do
             {
-                System.out.println("Invalid input. Please enter an interger number for credit points");
-            }
-        } while (!validation.isInt(cPointsNumber));
-        int cPoints = Integer.parseInt(cPointsNumber);
-        
-        int index = 0;
-        while (index < units.length && units[index] != null)
-            {
-                index++;
-            }
-        if (index < units.length)
-        {
-            units[index] = new Unit(uCode, uDesc, cPoints);
-        }
-        return units;
+                cPointsNumber = input.acceptStringInput("Please enter credit points: ");
+                if (!validation.isInt(cPointsNumber))
+                {
+                    System.out.println("Invalid input. Please enter an interger number for credit points");
+                }
+            } while (!validation.isInt(cPointsNumber));
+            int cPoints = Integer.parseInt(cPointsNumber);
+            
+            enrolment.setSpecificUnits(index, uCode, uDesc, cPoints);
     }
 
     public static void main(String[] args)
     {
-        Input console = new Input();
         University university = new University();
 
         university.startProgram();
@@ -187,37 +182,57 @@ public class University
     {
         Input console = new Input();
         int choice = 0;
-        String choice_string = "unknown";
+        String choiceString = "unknown";
         Validation validation = new Validation();
-        Enrolment enrolment = new Enrolment();
+        boolean quit = false;
 
         do
         {   
             do
             {
-                if(!validation.isInt(choice_string))
+                try
                 {
-                    System.out.println("Invalid choice. Please choose from the available menu numbers.");
-                }
-                choice_string = console.acceptStringInput("Please enter your choice: " 
+                    choiceString = console.acceptStringInput("Please enter your choice: " 
                 + "\n1: Enrol a student\n2: Exit the program");
-            } while(!validation.isInt(choice_string));
+                    choice = Integer.parseInt(choiceString);
+                }
+                catch (Exception e)
+                {
+                    System.out.println("Invalid choice. Please enter an integer.\n");
+                }
+            } while(validation.isBlank(choiceString) || !validation.isInt(choiceString));
 
-            choice = Integer.parseInt(choice_string);
             switch(choice)
             {
-                case 1: 
-                    enrolment.setStudent(inputStudentDetails());
-                    enrolment.setUnits(inputUnitDetails());
+                case 1:
+                    Enrolment enrolment = new Enrolment();
+                    do
+                    {
+                        choiceString = console.acceptStringInput("Please enter enrolment date: ");
+                        if (validation.isBlank(choiceString))
+                        {
+                            System.out.println("Date cannot be empty");
+                        }
+                    } while (validation.isBlank(choiceString));
+                    enrolment.setDate(choiceString);
+
+                    System.out.println("\nPlease input student details: ");
+                    inputStudentDetails(enrolment);
+
+                    System.out.println("\nPlease input unit(s) details: ");
+                    inputUnitDetails(enrolment);
+                    
+                    enrolments.add(enrolment);
                     break;
                 case 2:
+                    quit = true;
                     break;
                 default:
-                    System.out.println("Invalid choice. Please choose from the available menu numbers.");
-                    continue;
+                    System.out.println("Invalid choice. Please choose from the available menu numbers.\n");
+                    break;
             }
 
-        } while (choice != 2);   
+        } while (quit == false);   
     }
 
     public String toString()
