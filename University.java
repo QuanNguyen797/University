@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class University
 {
@@ -88,12 +89,13 @@ public class University
             }
         } while (!validation.isBlank(email));
 
-        this.student = new Student(name, address, phone, email);
+        Student student = new Student(name, address, phone, email);
         return student;
     }
 
-    public void inputUnitDetails()
+    public Unit[] inputUnitDetails()
     {
+        Unit[] units = new Unit[4];
         boolean null_flag = false;
         for (int index = 0; index < units.length; index++)
         {
@@ -106,7 +108,7 @@ public class University
         if (!null_flag)
         {
             System.out.println("Maximum 4 units enrolled. Please remove existing units to enroll in new ones.");
-            return;
+            return null;
         }       
 
         Scanner console = new Scanner(System.in);
@@ -154,7 +156,7 @@ public class University
         {
             units[index] = new Unit(uCode, uDesc, cPoints);
         }
-        this.displayUnits();
+        return units;
     }
 
     public static void main(String[] args)
@@ -187,6 +189,7 @@ public class University
         int choice = 0;
         String choice_string = "unknown";
         Validation validation = new Validation();
+        Enrolment enrolment = new Enrolment();
 
         do
         {   
@@ -196,29 +199,25 @@ public class University
                 {
                     System.out.println("Invalid choice. Please choose from the available menu numbers.");
                 }
-                choice_string = console.acceptStringInput("Please enter your choice: \n1: Input student detail\n2: Input unit details\n3: Remove a current unit\n4: Exit");
+                choice_string = console.acceptStringInput("Please enter your choice: " 
+                + "\n1: Enrol a student\n2: Exit the program");
             } while(!validation.isInt(choice_string));
 
             choice = Integer.parseInt(choice_string);
             switch(choice)
             {
                 case 1: 
-                    student = inputStudentDetails();
+                    enrolment.setStudent(inputStudentDetails());
+                    enrolment.setUnits(inputUnitDetails());
                     break;
                 case 2:
-                    this.inputUnitDetails();
-                    break;
-                case 3:
-                    this.removeUnit();
-                    break;
-                case 4:
                     break;
                 default:
                     System.out.println("Invalid choice. Please choose from the available menu numbers.");
                     continue;
             }
 
-        } while (choice != 4);   
+        } while (choice != 2);   
     }
 
     public String toString()
