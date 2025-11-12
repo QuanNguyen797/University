@@ -152,7 +152,24 @@ public class Enrolment
 
     public String toString()
     {
-        return "date: " + date + "\n"+ student.toString() + "\n" + 
-        units.toString();
+        String line = "";
+        String unitLine = "";
+        String unitsLine = "";
+
+        unitLine = "";
+        unitsLine = "";
+        
+        student = this.getStudent();
+        units = this.getUnits();
+        for (int i = 0; i < units.length; i++)
+        {
+            unitLine = units[i].toString();
+            unitsLine += unitLine;
+            if (i != units.length - 1)
+                unitsLine += ";";
+        }
+        line = this.getDate() + "," + student.toString() + "," + unitsLine;
+
+        return line;
     }
 }

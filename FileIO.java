@@ -31,11 +31,15 @@ public class FileIO
         {
             FileReader reader = new FileReader(fileName);
             scanner = new Scanner(reader);
-            while (scanner.hasNext())
+            if (scanner.hasNextLine())
             {
-                content += scanner.next() + "/";
+                content += scanner.nextLine();
             }
-
+            while (scanner.hasNextLine())
+            {
+    
+                content += "/" + scanner.nextLine() ;
+            }
         }
         catch (FileNotFoundException e)
         {

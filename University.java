@@ -2,6 +2,8 @@ import java.util.ArrayList;
 
 public class University
 {
+    private final String INPUT_FILE = "students.txt";
+    private final String OUTPUT_FILE = "export.txt";
     private ArrayList<Enrolment> enrolments;
 
     public University()
@@ -124,6 +126,7 @@ public class University
         String uCode = "unknown";
         String uDesc = "unknown";
         String cPointsNumber = "unknown";
+        int cPoints = -1;
         do
             {
                 uCode = input.acceptStringInput("\nPlease enter units code: ");
@@ -144,13 +147,19 @@ public class University
 
             do
             {
-                cPointsNumber = input.acceptStringInput("Please enter credit points: ");
-                if (!validation.isInt(cPointsNumber))
+                try
+                {
+                    cPointsNumber = input.acceptStringInput("Please enter credit points: ");
+                    cPoints = Integer.parseInt(cPointsNumber);
+                    if (cPoints < 0)
+                        System.out.println("Credit points must be 0 at minimum");
+                }
+                catch (Exception e)
                 {
                     System.out.println("Invalid input. Please enter an interger number for credit points");
                 }
-            } while (!validation.isInt(cPointsNumber));
-            int cPoints = Integer.parseInt(cPointsNumber);
+            } while (!validation.isInt(cPointsNumber) || cPoints < 0);
+            
             
             enrolment.setSpecificUnits(index, uCode, uDesc, cPoints);
     }
@@ -166,6 +175,61 @@ public class University
     public void removeEnrolment(int index)
     {
         enrolments.remove(index);
+    }
+
+    public void readFile()
+    {
+        FileIO fileIO = new FileIO(INPUT_FILE);
+        String content = fileIO.readFile();
+        String[] lines = content.split("/");
+        String[] items = null;
+        String date = "unknown";
+        String name = "unknown";
+        String address = "unknown";
+        String phone = "unknown";
+        String email = "unknown";
+        String uCode = "unknown";
+        String uDesc = "unknown";
+        int cPoint = -1;
+        String[] unitList = null;
+        Unit[] units = null;
+        String[] unitItems = null;
+        Student student = new Student();
+        Unit unit = new Unit();
+        int lineNumber = 0;
+
+        for (String line : lines)
+        {
+            lineNumber++;
+            try
+            {
+                items = line.split(",");
+
+                date = items[0].trim();
+                name = items[1].trim();
+                address = items[2].trim();
+                phone = items[3].trim();
+                email = items[4].trim();
+                student = new Student(name, address, phone, email);
+
+                unitList = items[5].trim().split(";");
+                units = new Unit[unitList.length];
+                for (int index = 0; index < units.length; index++)
+                {
+                    unitItems = unitList[index].split("-");
+                    uCode = unitItems[0];
+                    uDesc = unitItems[1];
+                    cPoint = Integer.parseInt(unitItems[2]);
+                    unit = new Unit(uCode, uDesc, cPoint);
+                    units[index] = unit;
+                }
+                enrolments.add(new Enrolment(date, student, units));
+            }
+            catch (Exception e)
+            {
+                System.out.println("Error reading line " + lineNumber);
+            }   
+        }
     }
 
     public void setEnrolments(ArrayList<Enrolment> enrolments)
@@ -185,6 +249,8 @@ public class University
         String choiceString = "unknown";
         Validation validation = new Validation();
         boolean quit = false;
+
+        this.readFile();
 
         do
         {   
@@ -226,6 +292,7 @@ public class University
                     break;
                 case 2:
                     quit = true;
+                    this.writeFile();
                     break;
                 default:
                     System.out.println("Invalid choice. Please choose from the available menu numbers.\n");
@@ -237,11 +304,20 @@ public class University
 
     public String toString()
     {
-        String enrolmentString = "";
-        for (Enrolment enrolment : enrolments)
+        String content = "";
+        
+        for (int i = 0; i < enrolments.size(); i++)
         {
-            enrolmentString += enrolment.toString() + "\n";
+            content += enrolments.get(i).toString();
+            if (i != enrolments.size() -1)
+                content += "\n";
         }
-        return enrolmentString;
+        return content;
+    }
+
+    public void writeFile()
+    {
+        FileIO fileIO = new FileIO(OUTPUT_FILE);
+        fileIO.writeFile(this.toString());
     }
 }

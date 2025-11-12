@@ -64,8 +64,7 @@
 
      public String toString()
      {
-        return "Unit Code: " + unitCode + "\n" + "Unit Description: " + 
-            unitDescription + "\n" + "Credit Points: " + creditPoints;
+        return this.getUnitCode() + "-" + this.getUnitDescription() + "-" + this.getCreditPoints();
      }   
 
 }

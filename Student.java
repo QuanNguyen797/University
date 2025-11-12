@@ -71,7 +71,7 @@ public class Student
 
     public String toString()
     {
-        return "name: " + name + "\n" + "address: " + address + "\n" + 
-        "phoneNo: " + phoneNo + "\n" + "email: " + email;
+        return this.getName() + "," + this.getAddress() + "," 
+                + this.getPhoneNo() + "," + this.getEmail();
     }
 }
