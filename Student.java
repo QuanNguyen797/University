@@ -1,4 +1,4 @@
-public class Student
+public abstract class Student
 {
     private String name;
     private String address;
@@ -38,6 +38,8 @@ public class Student
     {
         return email;
     }
+
+    public abstract String getStudentType();
 
     public String getName()
     {
