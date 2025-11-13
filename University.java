@@ -318,7 +318,7 @@ public class University
                 try
                 {
                     choiceString = console.acceptStringInput("Please enter your choice: " 
-                    + "\n1: Enrol a student\n2: Exit the program");
+                    + "\n1: Enrol a student\n2: View current students\n3: Exit the program");
                     choice = Integer.parseInt(choiceString);
                 }
                 catch (Exception e)
@@ -350,6 +350,9 @@ public class University
                     enrolments.add(enrolment);
                     break;
                 case 2:
+                    this.display();
+                    break;
+                case 3:
                     quit = true;
                     this.writeFile();
                     break;
