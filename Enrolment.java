@@ -7,7 +7,7 @@ public class Enrolment
     public Enrolment()
     {
         date = "unknown";
-        student = new Student();
+        student = new UGStudent();
         units = new Unit[4];
         for (int i = 0; i < units.length; i++)
         {
@@ -163,10 +163,13 @@ public class Enrolment
         units = this.getUnits();
         for (int i = 0; i < units.length; i++)
         {
-            unitLine = units[i].toString();
-            unitsLine += unitLine;
-            if (i != units.length - 1)
-                unitsLine += ";";
+            if (!units[i].getUnitCode().equals("unknown"))
+            {
+                unitLine = units[i].toString();
+                unitsLine += unitLine;
+                if (i != units.length - 1)
+                    unitsLine += ";";
+            }
         }
         line = this.getDate() + "," + student.toString() + "," + unitsLine;
 

@@ -31,7 +31,7 @@ public class UGStudent extends Student
 
     public String getStudentType()
     {
-        return "UGStudent";
+        return "Undergraduate";
     }
 
     public int getYear()

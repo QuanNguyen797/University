@@ -8,7 +8,7 @@ public class University
 
     public University()
     {
-        enrolments = new ArrayList<Enrolment>();
+        enrolments = new ArrayList<>();
     }
 
     public University(ArrayList<Enrolment> enrolments)
@@ -53,6 +53,12 @@ public class University
         String address = "unknown";
         String phone = "unknown";
         String email = "uknown";
+        String studentType = "unknown";
+        Student student = null;
+        String major = "unknown";
+        int year = 0;
+        String program = "unknown";
+        String advisor = "unknown";
 
         do
         {
@@ -90,8 +96,61 @@ public class University
             }
         } while (validation.isBlank(email));
 
-        Student student = new Student(name, address, phone, email);
-        enrolment.setStudent(student);
+        do
+        {
+            studentType = input.acceptStringInput("Please enter student type: U (Undergraduate) / P (Postgraduate)");
+            if (validation.isBlank(studentType) || !studentType.toLowerCase().equals("u") && !studentType.toLowerCase().equals("p"))
+                System.out.println("Invalid input. Please enter U or P");
+        } while (validation.isBlank(studentType) || !studentType.toLowerCase().equals("u") && !studentType.toLowerCase().equals("p"));
+
+        switch (studentType.toLowerCase())
+        {
+            case "u":
+                do
+                {
+                    major = input.acceptStringInput("Please enter student major: ");
+                    if (validation.isBlank(major))
+                        System.out.println("Error: Major cannot be blank.");
+                } while (validation.isBlank(major));
+
+                do
+                {
+                    try
+                    {
+                        year = input.acceptIntInput("Please enter current student year");
+                        if (year <= 0)
+                            System.out.println("Year must be larger than 0");
+                    }
+                    catch (Exception e)
+                    {
+                        System.out.println("Error: Please enter an integer number larger than 0");
+                    }
+                } while (year <= 0);
+                student = new UGStudent(name, address, phone, email, major, year);
+                break;
+            case "p":
+                do
+                {
+                    program = input.acceptStringInput("Please enter student program: ");
+                    if (validation.isBlank(program))
+                        System.out.println("Error: Program cannot be blank.");
+                } while (validation.isBlank(program));
+
+                do
+                {
+                    advisor = input.acceptStringInput("Please enter student advisor: ");
+                    if (validation.isBlank(advisor))
+                        System.out.println("Error: Advisor cannot be blank.");
+                } while (validation.isBlank(advisor));
+
+                student = new PGStudent(name, address, phone, email, program, advisor);
+                break;
+            default:
+                break;
+        }
+
+        if (student != null)
+            enrolment.setStudent(student);
     }
 
     public void inputUnitDetails(Enrolment enrolment)
@@ -194,7 +253,7 @@ public class University
         String[] unitList = null;
         Unit[] units = null;
         String[] unitItems = null;
-        Student student = new Student();
+        Student student = null;
         Unit unit = new Unit();
         int lineNumber = 0;
 
@@ -210,7 +269,7 @@ public class University
                 address = items[2].trim();
                 phone = items[3].trim();
                 email = items[4].trim();
-                student = new Student(name, address, phone, email);
+                student = new UGStudent(name, address, phone, email, "Information Technology", 1);
 
                 unitList = items[5].trim().split(";");
                 units = new Unit[unitList.length];
@@ -259,7 +318,7 @@ public class University
                 try
                 {
                     choiceString = console.acceptStringInput("Please enter your choice: " 
-                + "\n1: Enrol a student\n2: Exit the program");
+                    + "\n1: Enrol a student\n2: Exit the program");
                     choice = Integer.parseInt(choiceString);
                 }
                 catch (Exception e)

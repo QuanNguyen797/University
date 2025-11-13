@@ -31,7 +31,7 @@ public class PGStudent extends Student
 
     public String getStudentType()
     {
-        return "PGStudent";
+        return "Graduate";
     }
 
     public String getYear()
