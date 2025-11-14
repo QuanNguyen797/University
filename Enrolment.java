@@ -22,6 +22,40 @@ public class Enrolment
         this.units = units;
     }
 
+    public int chooseUnit()
+    {
+        Input input = new Input();
+        int choice = -2;
+        int unitNumber = 0;
+
+        System.out.println("\n" + student.getName() + "'s enrolled units: ");
+        for (int i = 0; i < units.length; i++)
+        {
+            if (!units[i].getUnitCode().equals("unknown"))
+            {
+                unitNumber++;
+                System.out.print("\n" + unitNumber + "): ");
+                units[i].display();
+            }
+        }
+
+        do
+        {
+            try
+            {
+                choice = input.acceptIntInput("Please select the unit number or 0 to cancel: ") - 1;
+                if (choice < -1 || choice >= units.length)
+                    System.out.println("Error: Choice input out of range. Please enter number in front of the chosen unit or 0 to cancel.\n");
+            }
+            catch (Exception e)
+            {
+                System.out.println("Error: invalid input. Please enter the integer number in front of the chosen unit or 0 to cancel.\n");
+            }
+        } while (choice < -1 || choice >= units.length);
+
+        return choice;
+    }
+
     public void display()
     {
         System.out.println("Enrolment date: " + date);
@@ -80,6 +114,22 @@ public class Enrolment
     public int getUnitsSize()
     {
         return units.length;
+    }
+
+    public int hasFreeUnitSlot()
+    {
+        int slot = -1;
+        
+        for (int i = 0; i < units.length; i++)
+        {
+            if (units[i].getUnitCode().equals("unknown"))
+            {
+                slot = i;
+                break;
+            }
+        }
+
+        return slot;
     }
 
     public void removeUnit()
@@ -174,40 +224,6 @@ public class Enrolment
         line = this.getDate() + "," + student.toString() + "," + unitsLine;
 
         return line;
-    }
-
-    public int chooseUnit()
-    {
-        Input input = new Input();
-        int choice = -2;
-        int unitNumber = 0;
-
-        System.out.println("\n" + student.getName() + "'s enrolled units: ");
-        for (int i = 0; i < units.length; i++)
-        {
-            if (!units[i].getUnitCode().equals("unknown"))
-            {
-                unitNumber++;
-                System.out.print("\n" + unitNumber + "): ");
-                units[i].display();
-            }
-        }
-
-        do
-        {
-            try
-            {
-                choice = input.acceptIntInput("Please select the unit number or 0 to cancel: ") - 1;
-                if (choice < -1 || choice >= units.length)
-                    System.out.println("Error: Choice input out of range. Please enter number in front of the chosen unit or 0 to cancel.\n");
-            }
-            catch (Exception e)
-            {
-                System.out.println("Error: invalid input. Please enter the integer number in front of the chosen unit or 0 to cancel.\n");
-            }
-        } while (choice < -1 || choice >= units.length);
-
-        return choice;
     }
 
     public void viewUnits()

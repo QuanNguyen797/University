@@ -16,6 +16,38 @@ public class University
         this.enrolments = enrolments;
     }
 
+    public void addEnrolment(Enrolment enrolment)
+    {
+        enrolments.add(enrolment);
+    }
+
+    public int chooseStudent()
+    {
+        Input input = new Input();
+        int choice = -2;
+        for (int i = 0; i < enrolments.size(); i++)
+        {
+            System.out.print("\n" + (i+1) + "): ");
+            enrolments.get(i).getStudent().display();
+        }
+
+        do
+        {
+            try
+            {
+                choice = input.acceptIntInput("\nPlease select the student number or 0 to cancel: ") - 1;
+                if (choice < -1 || choice >= enrolments.size())
+                    System.out.println("Error: Choice input out of range. Please enter number in front of the chosen student or 0 to cancel.\n");
+            }
+            catch (Exception e)
+            {
+                System.out.println("Error: invalid input. Please enter the integer number in front of the chosen student or 0 to cancel.\n");
+            }
+        } while (choice < -1 || choice >= enrolments.size());
+
+        return choice;
+    }
+
     public void display()
     {
         for(Enrolment enrolment : enrolments)
@@ -24,9 +56,63 @@ public class University
         }
     }
 
-    public void addEnrolment(Enrolment enrolment)
+    public void enrollUnenroll()
     {
-        enrolments.add(enrolment);
+        Input input = new Input();
+        Enrolment enrolment = new Enrolment();
+        int choice = chooseStudent();
+        int actionChoice = -1;
+        int unitChoice = 0;
+        boolean quit = false;
+
+        if (choice >= 0 && choice < enrolments.size())
+        {
+            enrolment = enrolments.get(choice);
+            while (!quit)
+            {
+                do
+                {
+                    try
+                    {
+                        actionChoice = input.acceptIntInput("\nPlease choose 1 to enroll, 2 to unenroll a unit, 3 to view currently enrolled units or 0 to cancel.");
+                        if (actionChoice < 0 || actionChoice > 2)
+                            System.out.println("Choice out of range. Please enter 1 to enroll, 2 to unenroll a unit, 3 to view currently enrolled units.");
+                    }
+                    catch (Exception e)
+                    {
+                        System.out.println("Invalid choice. Please enter 1 to enroll, 2 to unenroll a unit, 3 to view currently enrolled units.");
+                    }
+                } while (actionChoice < 0);
+
+                switch (actionChoice)
+                {
+                    case 0:
+                        quit = true;
+                        break;
+                    case 1:
+                        if (enrolment.hasFreeUnitSlot() > -1)
+                        {
+                            
+                            this.inputUnitDetailOnce(enrolment.hasFreeUnitSlot(), enrolment);
+                        }
+                        else
+                            System.out.println("Maximum enrolled units reached. Please remove a unit to enroll in another.");    
+                        break;
+                    case 2:
+                        unitChoice = enrolment.chooseUnit();
+                        if (unitChoice >= 0 && unitChoice < enrolment.getUnitsSize())
+                        {
+                            System.out.println("\n" + enrolment.getStudent().getName() + "'s " +  enrolment.getUnits()[unitChoice].getUnitCode() + " enrolment succesfully removed\n");
+                            enrolment.getUnits()[unitChoice] = new Unit();
+                        }
+                        break;
+                    case 3:
+                        enrolment.viewUnits();
+                    default:
+                        break;
+                }
+            }
+        }
     }
 
     public ArrayList<Enrolment> getEnrolments()
@@ -99,9 +185,11 @@ public class University
         do
         {
             studentType = input.acceptStringInput("Please enter student type: U (Undergraduate) / P (Postgraduate)");
-            if (validation.isBlank(studentType) || !studentType.toLowerCase().equals("u") && !studentType.toLowerCase().equals("p"))
+            if (validation.isBlank(studentType) || !studentType.toLowerCase().equals("u") 
+            && !studentType.toLowerCase().equals("p"))
                 System.out.println("Invalid input. Please enter U or P");
-        } while (validation.isBlank(studentType) || !studentType.toLowerCase().equals("u") && !studentType.toLowerCase().equals("p"));
+        } while (validation.isBlank(studentType) || !studentType.toLowerCase().equals("u") 
+        && !studentType.toLowerCase().equals("p"));
 
         switch (studentType.toLowerCase())
         {
@@ -271,8 +359,13 @@ public class University
                 student = new UGStudent(name, address, phone, email, "Information Technology", 1);
 
                 unitList = items[5].trim().split(";");
-                units = new Unit[unitList.length];
-                for (int index = 0; index < units.length; index++)
+                units = new Unit[4];
+                for (int unitIndex = 0; unitIndex < 4; unitIndex++)
+                {
+                    units[unitIndex] = new Unit();
+                }
+
+                for (int index = 0; index < unitList.length && index < units.length; index++)
                 {
                     unitItems = unitList[index].split("-");
                     uCode = unitItems[0];
@@ -288,6 +381,23 @@ public class University
                 System.out.println("Error reading line " + lineNumber);
             }   
         }
+    }
+
+     public void removeEnrolment()
+    {
+        Enrolment enrolment = new Enrolment();
+        System.out.println("\nChoose a student to remove");
+        int choice = chooseStudent();
+        if (choice >= 0 && choice < enrolments.size())
+        {
+            enrolment = enrolments.get(choice);
+            System.out.println("\n" + enrolment.getStudent().getName() + " removed succesfully.\n");
+            enrolments.remove(choice);
+        }
+        else if (choice == -1)
+        {
+            System.out.println("\nNo student removed.\n");
+        }     
     }
 
     public void setEnrolments(ArrayList<Enrolment> enrolments)
@@ -317,7 +427,7 @@ public class University
                 try
                 {
                     choiceString = console.acceptStringInput("\nPlease enter your choice: " 
-                    + "\n1: Enrol a student\n2: View current students\n3: Unit enrolment\n4: Remove student\n5: Exit the program");
+                    + "\n1: Enrol a student\n2: View current students\n3: Unit enrolment and unenrolment\n4: Remove student\n5: Exit the program");
                     choice = Integer.parseInt(choiceString);
                 }
                 catch (Exception e)
@@ -365,6 +475,7 @@ public class University
                 case 5:
                     quit = true;
                     this.writeFile();
+                    System.out.println("\nGoodbye!\n");
                     break;
                 default:
                     System.out.println("Invalid choice. Please choose from the available menu numbers.\n");
@@ -391,102 +502,5 @@ public class University
     {
         FileIO fileIO = new FileIO(OUTPUT_FILE);
         fileIO.writeFile(this.toString());
-    }
-
-    public int chooseStudent()
-    {
-        Input input = new Input();
-        int choice = -2;
-        for (int i = 0; i < enrolments.size(); i++)
-        {
-            System.out.print("\n" + (i+1) + "): ");
-            enrolments.get(i).getStudent().display();
-        }
-
-        do
-        {
-            try
-            {
-                choice = input.acceptIntInput("\nPlease select the student number or 0 to cancel: ") - 1;
-                if (choice < -1 || choice >= enrolments.size())
-                    System.out.println("Error: Choice input out of range. Please enter number in front of the chosen student or 0 to cancel.\n");
-            }
-            catch (Exception e)
-            {
-                System.out.println("Error: invalid input. Please enter the integer number in front of the chosen student or 0 to cancel.\n");
-            }
-        } while (choice < -1 || choice >= enrolments.size());
-
-        return choice;
-    }
-
-    public void removeEnrolment()
-    {
-        Enrolment enrolment = new Enrolment();
-        System.out.println("\nChoose a student to remove");
-        int choice = chooseStudent();
-        if (choice >= 0 && choice < enrolments.size())
-        {
-            enrolment = enrolments.get(choice);
-            System.out.println("\n" + enrolment.getStudent().getName() + " removed succesfully.\n");
-            enrolments.remove(choice);
-        }
-        else if (choice == -1)
-        {
-            System.out.println("\nNo student removed.\n");
-        }     
-    }
-
-    public void enrollUnenroll()
-    {
-        Input input = new Input();
-        Enrolment enrolment = new Enrolment();
-        int choice = chooseStudent();
-        int actionChoice = -1;
-        int unitChoice = 0;
-        boolean quit = false;
-
-        if (choice >= 0 && choice < enrolments.size())
-        {
-            enrolment = enrolments.get(choice);
-            while (!quit)
-            {
-                do
-                {
-                    try
-                    {
-                        actionChoice = input.acceptIntInput("\nPlease choose 1 to enroll, 2 to unenroll a unit, 3 to view currently enrolled units or 0 to cancel.");
-                        if (actionChoice < 0 || actionChoice > 2)
-                            System.out.println("Choice out of range. Please enter 1 to enroll, 2 to unenroll a unit, 3 to view currently enrolled units.");
-                    }
-                    catch (Exception e)
-                    {
-                        System.out.println("Invalid choice. Please enter 1 to enroll, 2 to unenroll a unit, 3 to view currently enrolled units.");
-                    }
-                } while (actionChoice < 0);
-
-                switch (actionChoice)
-                {
-                    case 0:
-                        quit = true;
-                        break;
-                    case 1:
-
-                        break;
-                    case 2:
-                        unitChoice = enrolment.chooseUnit();
-                        if (unitChoice >= 0 && unitChoice < enrolment.getUnitsSize())
-                        {
-                            System.out.println("\n" + enrolment.getStudent().getName() + "'s " +  enrolment.getUnits()[unitChoice].getUnitCode() + " enrolment succesfully removed\n");
-                            enrolment.getUnits()[unitChoice] = new Unit();
-                        }
-                        break;
-                    case 3:
-                        enrolment.viewUnits();
-                    default:
-                        break;
-                }
-            }
-        }
     }
 }
