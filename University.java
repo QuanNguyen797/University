@@ -228,7 +228,6 @@ public class University
         University university = new University();
 
         university.startProgram();
-        university.display();
     }
 
     public void removeEnrolment(int index)
@@ -318,7 +317,7 @@ public class University
                 try
                 {
                     choiceString = console.acceptStringInput("Please enter your choice: " 
-                    + "\n1: Enrol a student\n2: View current students\n3: Exit the program");
+                    + "\n1: Enrol a student\n2: View current students\n3: Unit enrolment\n4: Remove student\n5: Exit the program");
                     choice = Integer.parseInt(choiceString);
                 }
                 catch (Exception e)
@@ -350,9 +349,19 @@ public class University
                     enrolments.add(enrolment);
                     break;
                 case 2:
-                    this.display();
+                    for (Enrolment studentEnrolment : enrolments)
+                    {
+                        System.out.println("");
+                        studentEnrolment.getStudent().display();
+                    }
+                    System.out.println("");
                     break;
                 case 3:
+                    break;
+                case 4:
+                    this.removeEnrolment();
+                    break;
+                case 5:
                     quit = true;
                     this.writeFile();
                     break;
@@ -381,5 +390,49 @@ public class University
     {
         FileIO fileIO = new FileIO(OUTPUT_FILE);
         fileIO.writeFile(this.toString());
+    }
+
+    public int chooseEnrolment()
+    {
+        Input input = new Input();
+        int choice = -2;
+        for (int i = 0; i < enrolments.size(); i++)
+        {
+            System.out.print("\n" + (i+1) + "): ");
+            enrolments.get(i).getStudent().display();
+        }
+
+        do
+        {
+            try
+            {
+                choice = input.acceptIntInput("Please select the student number or 0 to cancel: ") - 1;
+                if (choice < -1 || choice >= enrolments.size())
+                    System.out.println("Error: Choice input out of range. Please enter number in front of the chosen student or 0 to cancel.\n");
+            }
+            catch (Exception e)
+            {
+                System.out.println("Error: invalid input. Please enter the integer number in front of the chosen student or 0 to cancel.\n");
+            }
+        } while (choice < -1 || choice >= enrolments.size());
+
+        return choice;
+    }
+
+    public void removeEnrolment()
+    {
+        Enrolment enrolment = new Enrolment();
+        System.out.println("\nChoose a student to remove");
+        int choice = chooseEnrolment();
+        if (choice >= 0 && choice < enrolments.size())
+        {
+            enrolment = enrolments.get(choice);
+            System.out.println("\n" + enrolment.getStudent().getName() + " removed succesfully.\n");
+            enrolments.remove(choice);
+        }
+        else if (choice == -1)
+        {
+            System.out.println("\nNo student removed.\n");
+        }     
     }
 }

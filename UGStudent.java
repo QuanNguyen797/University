@@ -19,9 +19,12 @@ public class UGStudent extends Student
 
     public void display()
     {
-        System.out.println(this.getName() + "," + this.getAddress() + "," 
-                + this.getPhoneNo() + "," + this.getEmail() + "," 
-                + major + "," + year);
+        System.out.println("Name: " + super.getName());
+        System.out.println("Address: " + super.getAddress()); 
+        System.out.println("PhoneNo: " + super.getPhoneNo());
+        System.out.println("Email: " + super.getEmail());
+        System.out.println("Major: " + major);
+        System.out.println("Year: " + year);
     }
 
     public String getMajor()

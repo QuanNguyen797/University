@@ -19,9 +19,12 @@ public class PGStudent extends Student
 
     public void display()
     {
-        System.out.println(this.getName() + "," + this.getAddress() + "," 
-                + this.getPhoneNo() + "," + this.getEmail() + "," 
-                + program + "," + advisor);
+        System.out.println("Name: " + super.getName());
+        System.out.println("Address: " + super.getAddress()); 
+        System.out.println("PhoneNo: " + super.getPhoneNo());
+        System.out.println("Email: " + super.getEmail());
+        System.out.println("Program: " + program);
+        System.out.println("Advisor: " + advisor);
     }
 
     public String getMajor()
