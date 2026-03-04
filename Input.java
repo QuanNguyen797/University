@@ -2,6 +2,7 @@ import java.util.Scanner;
 
 public class Input
 {
+    private static final Scanner CONSOLE = new Scanner(System.in);
 
     public Input()
     {
@@ -17,24 +18,21 @@ public class Input
     public double acceptDoubleInput(String displayMessage)
     {
         System.out.println(displayMessage);
-        Scanner console = new Scanner(System.in);
-        double input = Double.parseDouble(console.nextLine());
+        double input = Double.parseDouble(CONSOLE.nextLine());
         return input;
     }
 
     public int acceptIntInput(String displayMessage)
     {
         System.out.println(displayMessage);
-        Scanner console = new Scanner(System.in);
-        int input = Integer.parseInt(console.nextLine());
+        int input = Integer.parseInt(CONSOLE.nextLine());
         return input;
     }
 
     public String acceptStringInput(String displayMessage)
     {
         System.out.println(displayMessage);
-        Scanner console = new Scanner(System.in);
-        String input = console.nextLine();
+        String input = CONSOLE.nextLine();
         return input;
     }
 

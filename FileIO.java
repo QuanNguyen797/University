@@ -26,18 +26,14 @@ public class FileIO
     public String readFile()
     {
         String content = "";
-        Scanner scanner = null;
-        try
+        try (FileReader reader = new FileReader(fileName); Scanner scanner = new Scanner(reader))
         {
-            FileReader reader = new FileReader(fileName);
-            scanner = new Scanner(reader);
             if (scanner.hasNextLine())
             {
                 content += scanner.nextLine();
             }
             while (scanner.hasNextLine())
             {
-    
                 content += "/" + scanner.nextLine() ;
             }
         }
@@ -45,9 +41,9 @@ public class FileIO
         {
             System.out.println("Error reading file ");
         }
-        finally
+        catch (IOException e)
         {
-            scanner.close();
+            System.out.println("Error closing file.");
         }
         return content;
     }
@@ -59,11 +55,9 @@ public class FileIO
 
     public void writeFile(String content)
     {
-        try
+        try (FileWriter writer = new FileWriter(fileName))
         {
-            FileWriter writer = new FileWriter(fileName);
             writer.write(content);
-            writer.close();
         }
         catch (IOException e)
         {

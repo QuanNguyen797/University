@@ -75,14 +75,14 @@ public class University
                     try
                     {
                         actionChoice = input.acceptIntInput("\nPlease choose 1 to enroll, 2 to unenroll a unit, 3 to view currently enrolled units or 0 to cancel.");
-                        if (actionChoice < 0 || actionChoice > 2)
+                        if (actionChoice < 0 || actionChoice > 3)
                             System.out.println("Choice out of range. Please enter 1 to enroll, 2 to unenroll a unit, 3 to view currently enrolled units.");
                     }
                     catch (Exception e)
                     {
                         System.out.println("Invalid choice. Please enter 1 to enroll, 2 to unenroll a unit, 3 to view currently enrolled units.");
                     }
-                } while (actionChoice < 0);
+                } while (actionChoice < 0 || actionChoice > 3);
 
                 switch (actionChoice)
                 {
@@ -158,20 +158,20 @@ public class University
         do
         {
             address = input.acceptStringInput("Please enter student address: ");
-            if ((validation.isBlank(address) || !validation.stringLengthInRange(address, 25, 100)))
+            if ((validation.isBlank(address) || !validation.stringLengthInRange(address, 3, 100)))
             {
-                System.out.println("Invalid input. Student address must not be blank and between 25 and 100 characters.");
+                System.out.println("Invalid input. Student address must not be blank and between 3 and 100 characters.");
             }
-        } while ((validation.isBlank(address) || !validation.stringLengthInRange(address, 25, 100)));
+        } while ((validation.isBlank(address) || !validation.stringLengthInRange(address, 3, 100)));
 
         do
         {
             phone = input.acceptStringInput("Please enter student phone number: ");
-            if ((validation.isBlank(phone) || !validation.stringLengthInRange(phone, 10, 10)))
+            if ((validation.isBlank(phone) || !validation.stringLengthInRange(phone, 8, 10) || !validation.isInt(phone)))
             {
-                System.out.println("Invalid input. Student phone number must not be blank and exactly 10 numbers.");
+                System.out.println("Invalid input. Student phone number must not be blank, digits only, and 8 to 10 characters long.");
             }
-        } while ((validation.isBlank(phone) || !validation.stringLengthInRange(phone, 10, 10)));
+        } while ((validation.isBlank(phone) || !validation.stringLengthInRange(phone, 8, 10) || !validation.isInt(phone)));
 
         do
         {
@@ -251,14 +251,14 @@ public class University
             try
             {
                 unitNumber = console.acceptIntInput("Please enter number of units: ");
-                if (unitNumber < 0 || unitNumber > 4)
-                    System.out.println("Please enter an integer larger than 0 and less than 4");
+                if (unitNumber < 1 || unitNumber > 4)
+                    System.out.println("Please enter an integer between 1 and 4.");
             }
             catch (Exception e)
             {
-                System.out.println("Please enter an integer larger than 0 and less than 4");
+                System.out.println("Please enter an integer between 1 and 4.");
             }
-        } while (unitNumber < 0 || unitNumber > 4);
+        } while (unitNumber < 1 || unitNumber > 4);
 
         for (int index = 0; index < unitNumber; index++)
         {
@@ -327,60 +327,100 @@ public class University
     {
         FileIO fileIO = new FileIO(INPUT_FILE);
         String content = fileIO.readFile();
+        if (content.trim().length() == 0)
+            return;
+
         String[] lines = content.split("/");
-        String[] items = null;
-        String date = "unknown";
-        String name = "unknown";
-        String address = "unknown";
-        String phone = "unknown";
-        String email = "unknown";
-        String uCode = "unknown";
-        String uDesc = "unknown";
-        int cPoint = -1;
-        String[] unitList = null;
-        Unit[] units = null;
-        String[] unitItems = null;
-        Student student = null;
-        Unit unit = new Unit();
         int lineNumber = 0;
 
         for (String line : lines)
         {
             lineNumber++;
+            if (line.trim().length() == 0)
+                continue;
+
             try
             {
-                items = line.split(",");
-
-                date = items[0].trim();
-                name = items[1].trim();
-                address = items[2].trim();
-                phone = items[3].trim();
-                email = items[4].trim();
-                student = new UGStudent(name, address, phone, email, "Information Technology", 1);
-
-                unitList = items[5].trim().split(";");
-                units = new Unit[4];
-                for (int unitIndex = 0; unitIndex < 4; unitIndex++)
-                {
-                    units[unitIndex] = new Unit();
-                }
-
-                for (int index = 0; index < unitList.length && index < units.length; index++)
-                {
-                    unitItems = unitList[index].split("-");
-                    uCode = unitItems[0];
-                    uDesc = unitItems[1];
-                    cPoint = Integer.parseInt(unitItems[2]);
-                    unit = new Unit(uCode, uDesc, cPoint);
-                    units[index] = unit;
-                }
-                enrolments.add(new Enrolment(date, student, units));
+                Enrolment parsed = parseEnrolmentLine(line);
+                if (parsed != null)
+                    enrolments.add(parsed);
+                else
+                    System.out.println("Error reading line " + lineNumber);
             }
             catch (Exception e)
             {
                 System.out.println("Error reading line " + lineNumber);
             }   
         }
+    }
+
+    Enrolment parseEnrolmentLine(String line)
+    {
+        String[] items = line.split(",");
+        if (items.length < 6)
+            return null;
+
+        String date = items[0].trim();
+        String name = items[1].trim();
+        String address = items[2].trim();
+        String phone = items[3].trim();
+        String email = items[4].trim();
+        String unitField = items[items.length - 1].trim();
+        Student student = buildStudentFromItems(items, name, address, phone, email);
+        Unit[] units = parseUnits(unitField);
+
+        return new Enrolment(date, student, units);
+    }
+
+    private Student buildStudentFromItems(String[] items, String name, String address, String phone, String email)
+    {
+        if (items.length >= 8)
+        {
+            String field5 = items[5].trim();
+            String field6 = items[6].trim();
+            Validation validation = new Validation();
+            if (validation.isInt(field6))
+                return new UGStudent(name, address, phone, email, field5, Integer.parseInt(field6));
+            return new PGStudent(name, address, phone, email, field5, field6);
+        }
+
+        return new UGStudent(name, address, phone, email, "Information Technology", 1);
+    }
+
+    private Unit[] parseUnits(String unitField)
+    {
+        Unit[] units = new Unit[4];
+        for (int i = 0; i < units.length; i++)
+        {
+            units[i] = new Unit();
+        }
+
+        if (unitField.length() == 0)
+            return units;
+
+        String[] unitList = unitField.split(";");
+        for (int index = 0; index < unitList.length && index < units.length; index++)
+        {
+            Unit parsedUnit = parseUnit(unitList[index].trim());
+            if (parsedUnit != null)
+                units[index] = parsedUnit;
+        }
+        return units;
+    }
+
+    private Unit parseUnit(String unitRecord)
+    {
+        if (unitRecord.length() == 0)
+            return null;
+
+        String[] unitItems = unitRecord.split("-");
+        if (unitItems.length != 3)
+            return null;
+
+        String uCode = unitItems[0].trim();
+        String uDesc = unitItems[1].trim();
+        int cPoint = Integer.parseInt(unitItems[2].trim());
+        return new Unit(uCode, uDesc, cPoint);
     }
 
      public void removeEnrolment()

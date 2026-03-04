@@ -27,33 +27,44 @@ public class Enrolment
         Input input = new Input();
         int choice = -2;
         int unitNumber = 0;
+        int[] displayedIndexToUnitIndex = new int[units.length];
 
         System.out.println("\n" + student.getName() + "'s enrolled units: ");
         for (int i = 0; i < units.length; i++)
         {
             if (!units[i].getUnitCode().equals("unknown"))
             {
+                displayedIndexToUnitIndex[unitNumber] = i;
                 unitNumber++;
                 System.out.print("\n" + unitNumber + "): ");
                 units[i].display();
             }
         }
 
+        if (unitNumber == 0)
+        {
+            System.out.println("No units are currently enrolled.");
+            return -1;
+        }
+
         do
         {
             try
-            {
-                choice = input.acceptIntInput("Please select the unit number or 0 to cancel: ") - 1;
-                if (choice < -1 || choice >= units.length)
+            {   
+                choice = input.acceptIntInput("Please select the unit number or 0 to cancel: ");
+                if (choice < 0 || choice > unitNumber)
                     System.out.println("Error: Choice input out of range. Please enter number in front of the chosen unit or 0 to cancel.\n");
             }
             catch (Exception e)
             {
                 System.out.println("Error: invalid input. Please enter the integer number in front of the chosen unit or 0 to cancel.\n");
             }
-        } while (choice < -1 || choice >= units.length);
+        } while (choice < 0 || choice > unitNumber);
 
-        return choice;
+        if (choice == 0)
+            return -1;
+
+        return displayedIndexToUnitIndex[choice - 1];
     }
 
     public void display()
@@ -202,28 +213,21 @@ public class Enrolment
 
     public String toString()
     {
-        String line = "";
-        String unitLine = "";
-        String unitsLine = "";
-
-        unitLine = "";
-        unitsLine = "";
-        
         student = this.getStudent();
         units = this.getUnits();
+        StringBuilder unitsLine = new StringBuilder();
+
         for (int i = 0; i < units.length; i++)
         {
             if (!units[i].getUnitCode().equals("unknown"))
             {
-                unitLine = units[i].toString();
-                unitsLine += unitLine;
-                if (i != units.length - 1)
-                    unitsLine += ";";
+                if (unitsLine.length() > 0)
+                    unitsLine.append(";");
+                unitsLine.append(units[i].toString());
             }
         }
-        line = this.getDate() + "," + student.toString() + "," + unitsLine;
 
-        return line;
+        return this.getDate() + "," + student.toString() + "," + unitsLine.toString();
     }
 
     public void viewUnits()
